@@ -2,6 +2,6 @@
 
 public class Program
 {
-    static async Task Main(string[] args)
-        => await new Dots().Inicializar();
+    static void Main(string[] args)
+        => new Dots().Inicializar();
 }
