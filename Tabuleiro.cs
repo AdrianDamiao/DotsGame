@@ -117,17 +117,34 @@ public class Tabuleiro
                         TabuleiroCompleto[i, j] = '2';
     }
 
-    public void MarcarJogada(int posicao)
+    public void MarcarJogada(bool jogador)
     {
-        // Traduz o numero da tela para posição (x, y) da matriz
-        var coordenadas = MapearPosicao(posicao);
+        if(JogadasFinalizadas())
+            return;
 
-        if(TabuleiroCompleto[coordenadas.x, coordenadas.y] == ' ')
-        {
-            TabuleiroCompleto[coordenadas.x, coordenadas.y] = '=';
-        } else {
-            Console.WriteLine("Posição inválida!");
+        Console.WriteLine("Vez do Jogador: " + (jogador ? "Humano" : "Máquina"));
+        Console.WriteLine("Onde você quer jogar(número):");
+        string numero = Console.ReadLine() ?? "";
+
+        // Traduz o numero da tela para posição (x, y) da matriz
+        var coordenadas = MapearPosicao(int.Parse(numero));
+
+        while(!CoordenadasSaoValidas(coordenadas))
+        { 
+            if(TabuleiroCompleto[coordenadas.x, coordenadas.y] == (jogador ? 'x' : '='))
+                Console.WriteLine("Outro jogador já fez essa jogada!");
+
+            Console.WriteLine("Digite um valor válido:");
+            numero = Console.ReadLine() ?? "";
+            coordenadas = MapearPosicao(int.Parse(numero));
         }
+
+        TabuleiroCompleto[coordenadas.x, coordenadas.y] = jogador ? '=' : 'x';
+
+        TabuleiroCompleto[1, 1] = '1'; 
+        TabuleiroCompleto[1, 3] = '1';
+        TabuleiroCompleto[3, 1] = '1';
+        TabuleiroCompleto[3, 3] = '1';
     }
 
     private (int x, int y) MapearPosicao(int posicao)
@@ -144,6 +161,15 @@ public class Tabuleiro
             10 => (3, 4),
             11 => (4, 1),
             12 => (4, 3),
-            _ => throw new Exception("Erro ao mapear"),
+            _ => default,
         };
+
+    public bool JogadasFinalizadas()
+        => (TabuleiroCompleto[1, 1] != ' ' 
+            && TabuleiroCompleto[1, 3] != ' ' 
+            && TabuleiroCompleto[3, 1] != ' ' 
+            && TabuleiroCompleto[3, 3] != ' ');
+
+    private bool CoordenadasSaoValidas((int x, int y) coordenada)
+        => (TabuleiroCompleto[coordenada.x, coordenada.y] == ' ');
 }

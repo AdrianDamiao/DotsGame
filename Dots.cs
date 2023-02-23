@@ -2,9 +2,10 @@ namespace DotsGame;
 
 public class Dots
 {
+    private Tabuleiro tabuleiro = new();
     public void Inicializar()
     {
-        Console.Clear();
+        // Console.Clear();
         Console.WriteLine("Jogo Iniciado...");
 
         Thread.Sleep(TimeSpan.FromSeconds(3));
@@ -40,28 +41,44 @@ public class Dots
 
     public void IniciarJogo()
     {
-        Console.Clear();
-        
-        Tabuleiro tabuleiro = new Tabuleiro();
-        tabuleiro.ExibirTabuleiroComJogadasPossiveis();
-        
+        // Console.Clear();
+
+        //Verificar a possibilidade de exibir as jogadas possíveis conforme o andamento do jogo
+        ExibirTabuleiroComJogadasPossiveis();
+
         Console.WriteLine("Quem começará jogando? 1 - Humano | 2 - IA");
         int jogador = int.Parse(Console.ReadLine() ?? "");
-
-        if(jogador == 1 || jogador == 2) {
-            RealizarJogada(tabuleiro, jogador);
-        } else {
-            Console.WriteLine("Opção inválida!");
+        
+        if (jogador == 1 || jogador == 2)
+        {
+            while(!tabuleiro.JogadasFinalizadas())
+            {
+                RealizarJogada(tabuleiro, jogador == 1 ? true : false);
+            }
         }
+
+        ExibirJogadorVencedor();
     }
 
-    private void RealizarJogada(Tabuleiro tabuleiro, int jogador)
-    {
-        Console.WriteLine("Onde você quer jogar(número):");
-        string numero = Console.ReadLine() ?? "";
 
-        tabuleiro.MarcarJogada(int.Parse(numero));
+    private void RealizarJogada(Tabuleiro tabuleiro, bool jogador)
+    {
+        if(tabuleiro.JogadasFinalizadas())
+            return;
+        tabuleiro.MarcarJogada(jogador);
 
         tabuleiro.ExibirTabuleiro();
+        RealizarJogada(tabuleiro, !jogador);
+    }
+
+    private void ExibirTabuleiroComJogadasPossiveis()
+    {
+        Tabuleiro tabuleiro = new Tabuleiro();
+        tabuleiro.ExibirTabuleiroComJogadasPossiveis();
+    }
+
+    private void ExibirJogadorVencedor()
+    {
+        System.Console.WriteLine("Jogador 1 Venceu!\n");
     }
 }
