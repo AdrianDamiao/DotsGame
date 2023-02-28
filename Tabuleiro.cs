@@ -2,7 +2,12 @@ namespace DotsGame;
 
 public class Tabuleiro
 {
-    private const int tamanhoDoTabuleiro = 5; 
+    private const int TamTabuleiro = 5; 
+    private const char EspacoVazio = ' ';
+    private const char CaracterDePonto = '*';
+    private const char Jogador1 = '1'; 
+    private const char Jogador2 = '2'; 
+
     public char[,] TabuleiroCompleto { get; private set; }
     public Tabuleiro(){
         TabuleiroCompleto = new char[5, 5];
@@ -19,23 +24,23 @@ public class Tabuleiro
 
     private void PreencherPontos()
     {
-        for(int i = 0; i < tamanhoDoTabuleiro; i++)
+        for(int i = 0; i < TamTabuleiro; i++)
             if(i % 2 == 0)
-                for(int j = 0; j < tamanhoDoTabuleiro; j++)
+                for(int j = 0; j < TamTabuleiro; j++)
                     if(j % 2 == 0)
                         TabuleiroCompleto[i, j] = '*';
     }
 
     private void LimparJogadas()
     {
-        for(int i = 0; i < tamanhoDoTabuleiro; i++)
+        for(int i = 0; i < TamTabuleiro; i++)
         {
             if(i % 2 == 0){
-                for(int j = 0; j < tamanhoDoTabuleiro; j++)
+                for(int j = 0; j < TamTabuleiro; j++)
                     if(j % 2 == 1)
                         TabuleiroCompleto[i, j] = ' ';
             } else {
-                for(int k = 0; k < tamanhoDoTabuleiro; k++)
+                for(int k = 0; k < TamTabuleiro; k++)
                     if(k % 2 == 0)
                         TabuleiroCompleto[i, k] = ' ';
             }
@@ -44,9 +49,9 @@ public class Tabuleiro
 
     private void LimparPontuacao()
     {
-        for(int i = 0; i < tamanhoDoTabuleiro; i++)
+        for(int i = 0; i < TamTabuleiro; i++)
             if(i % 2 == 1)
-                for(int j = 0; j < tamanhoDoTabuleiro; j++)
+                for(int j = 0; j < TamTabuleiro; j++)
                     if(j % 2 == 1)
                         TabuleiroCompleto[i, j] = ' ';
     }
@@ -55,9 +60,9 @@ public class Tabuleiro
     {
         Console.WriteLine("Exibindo tabuleiro...\n");
 
-        for (int i = 0; i < tamanhoDoTabuleiro; i++)
+        for (int i = 0; i < TamTabuleiro; i++)
         {
-            for (int j = 0; j < tamanhoDoTabuleiro; j++)
+            for (int j = 0; j < TamTabuleiro; j++)
             {
                 Console.Write(" " + TabuleiroCompleto[i, j] + " ");
             }
@@ -79,8 +84,8 @@ public class Tabuleiro
 
     public void LimparTabuleiro()
     {
-        for (int i = 0; i < tamanhoDoTabuleiro; i++)
-            for (int j = 0; j < tamanhoDoTabuleiro; j++)
+        for (int i = 0; i < TamTabuleiro; i++)
+            for (int j = 0; j < TamTabuleiro; j++)
                 TabuleiroCompleto[i, j] = ' ';
     }
 
@@ -94,14 +99,14 @@ public class Tabuleiro
 
     private void PreencheExemploDeJogadas()
     {
-        for(int i = 0; i < tamanhoDoTabuleiro; i++)
+        for(int i = 0; i < TamTabuleiro; i++)
         {
             if(i % 2 == 0){
-                for(int j = 0; j < tamanhoDoTabuleiro; j++)
+                for(int j = 0; j < TamTabuleiro; j++)
                     if(j % 2 == 1)
                         TabuleiroCompleto[i, j] = '-';
             } else {
-                for(int k = 0; k < tamanhoDoTabuleiro; k++)
+                for(int k = 0; k < TamTabuleiro; k++)
                     if(k % 2 == 0)
                         TabuleiroCompleto[i, k] = '|';
             }
@@ -110,9 +115,9 @@ public class Tabuleiro
 
     private void PreencheExemploDePontuacao()
     {
-        for(int i = 0; i < tamanhoDoTabuleiro; i++)
+        for(int i = 0; i < TamTabuleiro; i++)
             if(i % 2 == 1)
-                for(int j = 0; j < tamanhoDoTabuleiro; j++)
+                for(int j = 0; j < TamTabuleiro; j++)
                     if(j % 2 == 1)
                         TabuleiroCompleto[i, j] = '2';
     }
@@ -127,27 +132,24 @@ public class Tabuleiro
         string numero = Console.ReadLine() ?? "";
 
         // Traduz o numero da tela para posição (x, y) da matriz
-        var coordenadas = MapearPosicao(int.Parse(numero));
+        var coordenada = MapearPosicao(int.Parse(numero));
 
-        while(!CoordenadasSaoValidas(coordenadas))
+        while(!CoordenadasSaoValidas(coordenada))
         { 
-            if(TabuleiroCompleto[coordenadas.x, coordenadas.y] == (jogador ? 'x' : '='))
+            if(TabuleiroCompleto[coordenada.linha, coordenada.coluna] == (jogador ? 'x' : '='))
                 Console.WriteLine("Outro jogador já fez essa jogada!");
 
             Console.WriteLine("Digite um valor válido:");
             numero = Console.ReadLine() ?? "";
-            coordenadas = MapearPosicao(int.Parse(numero));
+            coordenada = MapearPosicao(int.Parse(numero));
         }
 
-        TabuleiroCompleto[coordenadas.x, coordenadas.y] = jogador ? '=' : 'x';
+        TabuleiroCompleto[coordenada.linha, coordenada.coluna] = jogador ? '=' : 'x';
 
-        TabuleiroCompleto[1, 1] = '1'; 
-        TabuleiroCompleto[1, 3] = '1';
-        TabuleiroCompleto[3, 1] = '1';
-        TabuleiroCompleto[3, 3] = '1';
+        VerificarPontuacao(coordenada, jogador);
     }
 
-    private (int x, int y) MapearPosicao(int posicao)
+    private (int linha, int coluna) MapearPosicao(int posicao)
         => posicao switch {
             1 => (0, 1),
             2 => (0, 3),
@@ -170,6 +172,85 @@ public class Tabuleiro
             && TabuleiroCompleto[3, 1] != ' ' 
             && TabuleiroCompleto[3, 3] != ' ');
 
-    private bool CoordenadasSaoValidas((int x, int y) coordenada)
-        => (TabuleiroCompleto[coordenada.x, coordenada.y] == ' ');
+    private bool CoordenadasSaoValidas((int linha, int coluna) coordenada)
+        => (TabuleiroCompleto[coordenada.linha, coordenada.coluna] == ' ');
+
+    private void VerificarPontuacao((int linha, int coluna) coordenada, bool jogador)
+    {
+        // Verifica pra esquerda, se puder
+        if(coordenada.coluna - 2 >= 0 && (coordenada.linha - 1 >= 0 && coordenada.linha + 1 < TamTabuleiro))
+            VerificaQuadradoAEsquerda(coordenada.linha, coordenada.coluna, jogador);
+
+        // Verifica pra direita, se puder
+        if(coordenada.coluna + 2 < TamTabuleiro && (coordenada.linha - 1 >= 0 && coordenada.linha + 1 < TamTabuleiro))
+            VerificaQuadradoADireita(coordenada.linha, coordenada.coluna, jogador);
+
+        // //Verifica pra cima, se puder
+        if(coordenada.linha - 2 >= 0 && (coordenada.coluna - 1 >= 0 && coordenada.coluna + 1 < TamTabuleiro))
+            VerificaQuadradoAcima(coordenada.linha, coordenada.coluna, jogador);
+
+        //Verifica pra baixo, se puder
+        if(coordenada.linha + 2 < TamTabuleiro && (coordenada.coluna - 1 >= 0 && coordenada.coluna + 1 < TamTabuleiro))
+            VerificaQuadradoAbaixo(coordenada.linha, coordenada.coluna, jogador);
+    }
+
+    private void VerificaQuadradoAEsquerda(int linha, int coluna, bool jogador)
+    {
+        if(TabuleiroCompleto[linha, coluna] != EspacoVazio
+            && TabuleiroCompleto[linha, coluna - 2] != EspacoVazio
+            && TabuleiroCompleto[linha + 1, coluna - 1] != EspacoVazio
+            && TabuleiroCompleto[linha - 1, coluna - 1] != EspacoVazio
+            && TabuleiroCompleto[linha, coluna - 1] != CaracterDePonto)
+        {
+            TabuleiroCompleto[linha, coluna - 1] = SimboloDoJogador(jogador);
+            LiberarOutraJogada(jogador);
+        }
+    }
+
+    private void VerificaQuadradoADireita(int linha, int coluna, bool jogador)
+    {
+        if(TabuleiroCompleto[linha, coluna] != EspacoVazio
+            && TabuleiroCompleto[linha, coluna + 2] != EspacoVazio
+            && TabuleiroCompleto[linha + 1, coluna + 1] != EspacoVazio
+            && TabuleiroCompleto[linha - 1, coluna + 1] != EspacoVazio
+            && TabuleiroCompleto[linha, coluna + 1] != CaracterDePonto)
+        {
+            TabuleiroCompleto[linha, coluna + 1] = SimboloDoJogador(jogador);
+            LiberarOutraJogada(jogador);
+        }
+    }
+
+    private void VerificaQuadradoAcima(int linha, int coluna, bool jogador)
+    {
+        if(TabuleiroCompleto[linha, coluna] != EspacoVazio
+            && TabuleiroCompleto[linha - 2, coluna] != EspacoVazio
+            && TabuleiroCompleto[linha - 1, coluna + 1] != EspacoVazio
+            && TabuleiroCompleto[linha - 1, coluna - 1] != EspacoVazio
+            && TabuleiroCompleto[linha - 1, coluna] != CaracterDePonto)
+        {
+            TabuleiroCompleto[linha - 1, coluna] = SimboloDoJogador(jogador);
+            LiberarOutraJogada(jogador);
+        }
+    }
+    private void VerificaQuadradoAbaixo(int linha, int coluna, bool jogador)
+    {
+        if(TabuleiroCompleto[linha, coluna] != EspacoVazio
+            && TabuleiroCompleto[linha + 2, coluna] != EspacoVazio
+            && TabuleiroCompleto[linha + 1, coluna + 1] != EspacoVazio
+            && TabuleiroCompleto[linha + 1, coluna - 1] != EspacoVazio
+            && TabuleiroCompleto[linha + 1, coluna] != CaracterDePonto)
+        {
+            TabuleiroCompleto[linha + 1, coluna] = SimboloDoJogador(jogador);
+            LiberarOutraJogada(jogador);
+        }
+    }
+
+    private void LiberarOutraJogada(bool jogador)
+    {
+        System.Console.WriteLine("Parabéns, você joga de novo!");
+        MarcarJogada(jogador);
+    }
+
+    private char SimboloDoJogador(bool jogador)
+        => jogador ? Jogador1 : Jogador2;
 }
