@@ -2,13 +2,28 @@ namespace DotsGame;
 
 public class Dots
 {
+    private const int NumeroJogadasPossiveis = 12;
+    private const int TamanhoDoTabuleiro = 5;
+    
     private Tabuleiro tabuleiro = new();
+    private No noRaiz = new No();
+
+
+    //Certo
+    private bool[] JogadasPossiveis { get; set; } = new bool[12]{
+        true, true, true, true,
+        true, true, true, true,
+        true, true, true, true
+    };
+
+    //////////
+
     public void Inicializar()
     {
         // Console.Clear();
         Console.WriteLine("Jogo Iniciado...");
 
-        Thread.Sleep(TimeSpan.FromSeconds(3));
+        // Thread.Sleep(TimeSpan.FromSeconds(3));
 
         string opcaoDigitada;
         int opcaoNumero;
@@ -35,50 +50,103 @@ public class Dots
         Console.WriteLine("Exibindo tutorial...");
         Console.WriteLine("O jogo Dots é composto por 9 pontos....");
 
-        Tabuleiro tabuleiro = new();
-        tabuleiro.ExibeTabuleiroDoTutorial();
+        No no = new();
+        no.ExibeTabuleiroDoTutorial();
     }
 
     public void IniciarJogo()
     {
-        // Console.Clear();
-
         //Verificar a possibilidade de exibir as jogadas possíveis conforme o andamento do jogo
         ExibirTabuleiroComJogadasPossiveis();
 
-        Console.WriteLine("Quem começará jogando? 1 - Humano | 2 - IA");
-        int jogador = int.Parse(Console.ReadLine() ?? "");
+        // Força primeira jogada da IA na posição 1
+        var coordenada = noRaiz.MapearPosicao(1);
+        bool jogador = false;
+        JogadasPossiveis[0] = false;
+        noRaiz.Tabuleiro[coordenada.linha, coordenada.coluna] = 'x';
+
+        // Espera o jogador fazer a segunda jogada
+        Console.WriteLine("Onde você quer jogar(número):");
+        string numero = Console.ReadLine() ?? "";
+        coordenada = noRaiz.MapearPosicao(int.Parse(numero));
+        noRaiz.Tabuleiro[coordenada.linha, coordenada.coluna] = 'x';
+        JogadasPossiveis[int.Parse(numero) - 1] = false;
         
-        if (jogador == 1 || jogador == 2)
+        // Após jogar duas vezes, começa a preencher a árvore
+        if(JogadasPossiveis.Count(jogada => jogada == false) >= 2)
         {
-            while(!tabuleiro.JogadasFinalizadas())
-            {
-                RealizarJogada(tabuleiro, jogador == 1 ? true : false);
-            }
+            PreencheArvoreDePossibilidades(noRaiz, JogadasPossiveis, jogador);
         }
+
+        // while(!noRaiz.JogadasFinalizadas())
+        // {
+        //     RealizarJogada(noRaiz, jogador);
+        // }
 
         ExibirJogadorVencedor();
     }
 
 
-    private void RealizarJogada(Tabuleiro tabuleiro, bool jogador)
+    private void RealizarJogada(No noRaiz, bool jogador)
     {
-        if(tabuleiro.JogadasFinalizadas())
+        if(noRaiz.JogadasFinalizadas())
             return;
-        tabuleiro.MarcarJogada(jogador);
 
-        tabuleiro.ExibirTabuleiro();
-        RealizarJogada(tabuleiro, !jogador);
+        noRaiz.MarcarJogada(jogador);
+
+        noRaiz.ExibirTabuleiro();
+        RealizarJogada(noRaiz, !jogador);
     }
 
     private void ExibirTabuleiroComJogadasPossiveis()
     {
-        Tabuleiro tabuleiro = new Tabuleiro();
-        tabuleiro.ExibirTabuleiroComJogadasPossiveis();
+        No no = new();
+        no.ExibirTabuleiroComJogadasPossiveis();
     }
 
     private void ExibirJogadorVencedor()
     {
-        System.Console.WriteLine("Jogador 1 Venceu!\n");
+        var pontuacoes = new List<(int linha, int coluna)>(){
+            (1, 1), (1, 3), (3, 1), (3, 3),
+        };
+
+        int pontuacaoJogador1 = 0;
+        int pontuacaoJogador2 = 0;
+
+        foreach(var ponto in pontuacoes)
+        {
+            if(tabuleiro.TabuleiroCompleto[ponto.linha, ponto.coluna] == 1)
+                pontuacaoJogador1++;
+            else
+                pontuacaoJogador2++;
+        }
+
+        System.Console.WriteLine($"Jogador {(pontuacaoJogador1 > pontuacaoJogador2 ? "1" : "2")} Venceu!\n");
+    }
+
+    private void PreencheArvoreDePossibilidades(No no, bool[] jogadasPossiveis, bool jogador)
+    {
+        if(jogadasPossiveis.Count(jogada => jogada == true) == 0)
+            return;
+
+        for(int i = 0; i < jogadasPossiveis.Length; i++)
+        {
+            // Tem mais de duas jogadas já?
+            if(jogadasPossiveis[i] == true)
+            {
+                No filho = new No();
+
+                // Realiza Jogada
+                var coordenada = filho.MapearPosicao(i+1);
+                filho.Tabuleiro[coordenada.linha, coordenada.coluna] = 'x';
+                
+                jogadasPossiveis[i] = false;
+                no.Filhos.Add(filho);
+
+                filho.ValorMinMax = int.MinValue;
+                PreencheArvoreDePossibilidades(filho, jogadasPossiveis, jogador);
+                jogadasPossiveis[i] = true;
+            }
+        }
     }
 }
