@@ -7,16 +7,11 @@ public class Dots
     
     private Tabuleiro tabuleiro = new();
     private No noRaiz = new No();
-
-
-    //Certo
     private bool[] JogadasPossiveis { get; set; } = new bool[12]{
         true, true, true, true,
         true, true, true, true,
-        true, true, true, true
+        true, true, true, true,
     };
-
-    //////////
 
     public void Inicializar()
     {
@@ -78,10 +73,11 @@ public class Dots
             PreencheArvoreDePossibilidades(noRaiz, JogadasPossiveis, jogador);
         }
 
-        // while(!noRaiz.JogadasFinalizadas())
-        // {
-        //     RealizarJogada(noRaiz, jogador);
-        // }
+        // Não finalizado ainda
+        while(!noRaiz.JogadasFinalizadas())
+        {
+            RealizarJogada(noRaiz, jogador);
+        }
 
         ExibirJogadorVencedor();
     }
@@ -126,24 +122,21 @@ public class Dots
 
     private void PreencheArvoreDePossibilidades(No no, bool[] jogadasPossiveis, bool jogador)
     {
-        if(jogadasPossiveis.Count(jogada => jogada == true) == 0)
-            return;
-
         for(int i = 0; i < jogadasPossiveis.Length; i++)
         {
-            // Tem mais de duas jogadas já?
+            // Jogada é possivel?
             if(jogadasPossiveis[i] == true)
             {
                 No filho = new No();
 
                 // Realiza Jogada
-                var coordenada = filho.MapearPosicao(i+1);
-                filho.Tabuleiro[coordenada.linha, coordenada.coluna] = 'x';
+                // var coordenada = filho.MapearPosicao(i+1);
+                // filho.Tabuleiro[coordenada.linha, coordenada.coluna] = 'x';
                 
                 jogadasPossiveis[i] = false;
                 no.Filhos.Add(filho);
 
-                filho.ValorMinMax = int.MinValue;
+                // filho.ValorMinMax = int.MinValue;
                 PreencheArvoreDePossibilidades(filho, jogadasPossiveis, jogador);
                 jogadasPossiveis[i] = true;
             }
