@@ -20,9 +20,9 @@ namespace DotsGame
 
         public void CopiaMatriz(No noPai)
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 5; i++)
             {
-                for (int j = 0; j < 3; j++)
+                for (int j = 0; j < 5; j++)
                 {
                     Tabuleiro[i, j] = noPai.Tabuleiro[i, j];
                 }
@@ -190,7 +190,7 @@ namespace DotsGame
         private bool CoordenadasSaoValidas((int linha, int coluna) coordenada)
             => (Tabuleiro[coordenada.linha, coordenada.coluna] == ' ');
 
-        private void VerificarPontuacao((int linha, int coluna) coordenada, bool jogador)
+        public bool VerificarPontuacao((int linha, int coluna) coordenada, bool jogador)
         {
             bool jogadorPontuou = false;
 
@@ -210,8 +210,10 @@ namespace DotsGame
             if(coordenada.linha + 2 < TamanhoDoTabuleiro && (coordenada.coluna - 1 >= 0 && coordenada.coluna + 1 < TamanhoDoTabuleiro))
                 jogadorPontuou = VerificaQuadradoAbaixo(coordenada.linha, coordenada.coluna, jogador);
 
-            if(jogadorPontuou)
-                LiberarOutraJogada(jogador);
+            // if(jogadorPontuou)
+            //     LiberarOutraJogada(jogador);
+            
+            return jogadorPontuou;
         }
 
         private bool VerificaQuadradoAEsquerda(int linha, int coluna, bool jogador)

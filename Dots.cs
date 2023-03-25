@@ -120,6 +120,34 @@ public class Dots
         System.Console.WriteLine($"Jogador {(pontuacaoJogador1 > pontuacaoJogador2 ? "1" : "2")} Venceu!\n");
     }
 
+    // private int EncontrarGanhador(No no)
+    // {
+    //     if(!no.JogadasFinalizadas()) {
+    //         return 2; // Jogo não finalizado ainda.
+    //     }
+        
+
+    //     var locaisDePontuacao = new List<(int linha, int coluna)>(){
+    //         (1, 1), (1, 3), (3, 1), (3, 3),
+    //     };
+
+    //     int pontuacaoJogador = 0;
+    //     int pontuacaoMaquina = 0;
+
+    //     foreach(var local in locaisDePontuacao)
+    //     {
+    //         if(no.Tabuleiro[local.linha, local.coluna] == '1')
+    //             pontuacaoJogador++;
+    //         else
+    //             pontuacaoMaquina++;
+    //     }
+
+    //     if(pontuacaoJogador == pontuacaoMaquina)
+    //         return 0;
+
+    //     return pontuacaoJogador > pontuacaoMaquina ? 1 : 2; 
+    // }
+
     private void PreencheArvoreDePossibilidades(No no, bool[] jogadasPossiveis, bool jogador)
     {
         for(int i = 0; i < jogadasPossiveis.Length; i++)
@@ -129,17 +157,80 @@ public class Dots
             {
                 No filho = new No();
 
-                // Realiza Jogada
-                // var coordenada = filho.MapearPosicao(i+1);
-                // filho.Tabuleiro[coordenada.linha, coordenada.coluna] = 'x';
-                
+                // Copia o tabuleiro do Pai
+                filho.CopiaMatriz(no);
+
+                // Realiza Jogada do filho
+                var coordenada = filho.MapearPosicao(i+1);
+                filho.Tabuleiro[coordenada.linha, coordenada.coluna] = 'x';
+
                 jogadasPossiveis[i] = false;
                 no.Filhos.Add(filho);
 
-                // filho.ValorMinMax = int.MinValue;
-                PreencheArvoreDePossibilidades(filho, jogadasPossiveis, jogador);
+                if(jogador) 
+                    filho.ValorMinMax = Int32.MinValue;
+                else
+                    filho.ValorMinMax = Int32.MaxValue; 
+
+                if(filho.VerificarPontuacao(coordenada, jogador) == true)
+                {
+                    PreencheArvoreDePossibilidades(filho, jogadasPossiveis, jogador);
+                } else {
+                    if(jogador) {
+                        PreencheArvoreDePossibilidades(filho, jogadasPossiveis, !jogador);
+                    }
+                    else 
+                    {
+                        PreencheArvoreDePossibilidades(filho, jogadasPossiveis, !jogador);
+                    }
+                }
                 jogadasPossiveis[i] = true;
             }
         }
     }
+
+    // private int AvaliaMiniMax(No no, bool jogador)
+    // {
+    //     var ganhador = EncontrarGanhador(no);
+
+    //     if (ganhador != 2) // Se o jogo foi finalizado
+    //     {
+    //         if (ganhador == 1)
+    //         {
+    //             return 1;
+    //         }
+    //         else if (ganhador == -1)
+    //         {
+    //             return -1;
+    //         }
+    //         else
+    //         {
+    //             return 0;
+    //         }
+    //     }
+    //     else
+    //     {
+    //         if (jogador)
+    //         {
+    //             for (int i = 0; i < no.Filhos.Count; i++)
+    //             {
+    //                 var resultado = AvaliaMiniMax(no.Filhos[i], !jogador);
+    //                 if (resultado < no.ValorMinMax)
+    //                     no.ValorMinMax = resultado;
+    //             }
+    //             return no.ValorMinMax;
+    //         }
+    //         else if (!jogador)
+    //         {
+    //             for (int i = 0; i < no.Filhos.Count; i++)
+    //             {
+    //                 var resultado = AvaliaMiniMax(no.Filhos[i], !jogador);
+    //                 if (resultado > no.ValorMinMax)
+    //                     no.ValorMinMax = resultado;
+    //             }
+    //             return no.ValorMinMax;
+    //         }
+    //     }
+    //     return 0;
+    // }
 }
