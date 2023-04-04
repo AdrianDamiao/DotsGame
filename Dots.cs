@@ -77,17 +77,22 @@ public class Dots
             PreencheArvoreDePossibilidades(noRaiz, JogadasPossiveis, jogador);
         }
 
+        // Avalia o min e max
         AvaliaMiniMax(noRaiz, jogador);
 
-        Jogar(noRaiz, jogador);
 
-        // Não finalizado ainda
-        while(!noRaiz.JogadasFinalizadas())
-        {
-            RealizarJogada(noRaiz, jogador);
-        }
+        // realiza as jogadas
+        var resultado = Jogar(noRaiz, jogador);
+        if(resultado == 1 || resultado == -1 || resultado == 0)
+            return;
 
-        ExibirJogadorVencedor();
+        // // Não finalizado ainda
+        // while(!noRaiz.JogadasFinalizadas())
+        // {
+        //     RealizarJogada(noRaiz, jogador);
+        // }
+
+        // ExibirJogadorVencedor();
     }
 
 
@@ -134,7 +139,6 @@ public class Dots
             return 2; // Jogo não finalizado ainda.
         }
         
-
         var locaisDePontuacao = new List<(int linha, int coluna)>(){
             (1, 1), (1, 3), (3, 1), (3, 3),
         };
@@ -146,7 +150,7 @@ public class Dots
         {
             if(no.Tabuleiro[local.linha, local.coluna] == '1')
                 pontuacaoJogador++;
-            else
+            else if(no.Tabuleiro[local.linha, local.coluna] == '2')
                 pontuacaoMaquina++;
         }
 
@@ -162,7 +166,7 @@ public class Dots
         {
             // Jogada é possivel?
             if(jogadasPossiveis[i] == true)
-            {
+            {   
                 No filho = new No();
 
                 // Copia o tabuleiro do Pai
@@ -273,7 +277,9 @@ public class Dots
                 {
                     for(int j = 0; j < 5; j++)
                     {
-                        if(no.Filhos[indiceMelhorFilho].Tabuleiro[i, j] != TabuleiroOficial[i, j])
+                        if(no.Filhos[indiceMelhorFilho].Tabuleiro[i, j] != TabuleiroOficial[i, j]
+                            && no.Filhos[indiceMelhorFilho].Tabuleiro[i, j] != '2'
+                            && no.Filhos[indiceMelhorFilho].Tabuleiro[i, j] != '1')
                         {
                             coordenadaDaJogada = (i, j);
                         }
@@ -286,8 +292,9 @@ public class Dots
                 Thread.Sleep(2000);
 
 
-                if(no.Filhos[indiceMelhorFilho].VerificarPontuacao(coordenadaDaJogada, jogador) == true)
+                if(no.Filhos[indiceMelhorFilho].VerificarPontuacao(coordenadaDaJogada, false) == true)
                 {
+                    System.Console.WriteLine("IA marcou ponto");
                     Jogar(no.Filhos[indiceMelhorFilho], jogador);
                 }
                 else
@@ -324,7 +331,17 @@ public class Dots
                         indiceFilhoCorreto = index;
                     }
                 }
-                Jogar(no.Filhos[indiceFilhoCorreto], !jogador);
+                // no.Filhos[indiceFilhoCorreto].Tabuleiro[coordenada.linha, coordenada.coluna] = 'x';
+
+                if(no.Filhos[indiceFilhoCorreto].VerificarPontuacao(coordenada, true) == true)
+                {
+                    System.Console.WriteLine("Player marcou ponto");
+                    Jogar(no.Filhos[indiceFilhoCorreto], jogador);
+                }
+                else
+                {
+                    Jogar(no.Filhos[indiceFilhoCorreto], !jogador);
+                }
             }
         }
         return 0;

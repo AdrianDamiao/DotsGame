@@ -192,28 +192,37 @@ namespace DotsGame
 
         public bool VerificarPontuacao((int linha, int coluna) coordenada, bool jogador)
         {
+            var contadorDePontuacoes = 0;
             bool jogadorPontuou = false;
 
             // Verifica pra esquerda, se puder
             if(coordenada.coluna - 2 >= 0 && (coordenada.linha - 1 >= 0 && coordenada.linha + 1 < TamanhoDoTabuleiro))
                 jogadorPontuou = VerificaQuadradoAEsquerda(coordenada.linha, coordenada.coluna, jogador);
+                if(jogadorPontuou)
+                    contadorDePontuacoes++;
 
             // Verifica pra direita, se puder
             if(coordenada.coluna + 2 < TamanhoDoTabuleiro && (coordenada.linha - 1 >= 0 && coordenada.linha + 1 < TamanhoDoTabuleiro))
                 jogadorPontuou = VerificaQuadradoADireita(coordenada.linha, coordenada.coluna, jogador);
+                if(jogadorPontuou)
+                    contadorDePontuacoes++;
 
             // //Verifica pra cima, se puder
             if(coordenada.linha - 2 >= 0 && (coordenada.coluna - 1 >= 0 && coordenada.coluna + 1 < TamanhoDoTabuleiro))
                 jogadorPontuou = VerificaQuadradoAcima(coordenada.linha, coordenada.coluna, jogador);
+                if(jogadorPontuou)
+                    contadorDePontuacoes++;
 
             //Verifica pra baixo, se puder
             if(coordenada.linha + 2 < TamanhoDoTabuleiro && (coordenada.coluna - 1 >= 0 && coordenada.coluna + 1 < TamanhoDoTabuleiro))
                 jogadorPontuou = VerificaQuadradoAbaixo(coordenada.linha, coordenada.coluna, jogador);
+                if(jogadorPontuou)
+                    contadorDePontuacoes++;
 
             // if(jogadorPontuou)
             //     LiberarOutraJogada(jogador);
             
-            return jogadorPontuou;
+            return contadorDePontuacoes > 0 ? true : false;
         }
 
         private bool VerificaQuadradoAEsquerda(int linha, int coluna, bool jogador)
